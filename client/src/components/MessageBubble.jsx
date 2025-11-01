@@ -1,6 +1,6 @@
 import React from 'react';
 
-const MessageBubble = ({ message, isUser, timestamp }) => {
+const MessageBubble = ({ message, isUser, timestamp, senderName, isGroupMessage = false, status }) => {
   const formatTime = (isoString) => {
     if (!isoString) return '';
     const date = new Date(isoString);
@@ -8,6 +8,40 @@ const MessageBubble = ({ message, isUser, timestamp }) => {
       hour: '2-digit', 
       minute: '2-digit' 
     });
+  };
+
+  // Render status ticks for sent messages
+  const renderStatusTicks = () => {
+    if (!isUser || isGroupMessage) return null; // Only show ticks for user's direct messages
+    
+    if (status === 'delivered') {
+      // Double tick (blue) - message delivered/seen
+      return (
+        <span className="inline-flex ml-1">
+          <svg className="w-4 h-4 text-blue-400" viewBox="0 0 16 15" fill="currentColor">
+            <path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.88a.32.32 0 0 1-.484.033l-.358-.325a.32.32 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.54l1.32 1.267a.32.32 0 0 0 .484-.034l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.88a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z"/>
+          </svg>
+        </span>
+      );
+    } else if (status === 'sent') {
+      // Single tick (gray) - message sent but not delivered
+      return (
+        <span className="inline-flex ml-1">
+          <svg className="w-4 h-4 text-gray-400" viewBox="0 0 16 15" fill="currentColor">
+            <path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.88a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l6.258 6.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z"/>
+          </svg>
+        </span>
+      );
+    } else if (status === 'sending') {
+      // Clock icon for sending
+      return (
+        <svg className="w-3 h-3 text-gray-400 inline ml-1 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" strokeWidth="2" stroke="currentColor" opacity="0.25"/>
+          <path d="M4 12a8 8 0 018-8" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      );
+    }
+    return null;
   };
 
   return (
@@ -31,6 +65,12 @@ const MessageBubble = ({ message, isUser, timestamp }) => {
 
         {/* Message Content */}
         <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}>
+          {/* Group Message Sender Name */}
+          {isGroupMessage && !isUser && senderName && (
+            <span className="text-xs text-gray-500 mb-1 px-2 font-medium">
+              {senderName}
+            </span>
+          )}
           <div className={`rounded-2xl px-4 py-2 shadow-md ${
             isUser 
               ? 'bg-blue-500 text-white rounded-tr-sm' 
@@ -41,8 +81,9 @@ const MessageBubble = ({ message, isUser, timestamp }) => {
             </p>
           </div>
           {timestamp && (
-            <span className="text-xs text-gray-500 mt-1 px-2">
+            <span className="text-xs text-gray-500 mt-1 px-2 flex items-center gap-1">
               {formatTime(timestamp)}
+              {renderStatusTicks()}
             </span>
           )}
         </div>
