@@ -15,15 +15,31 @@ dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
+
+// Get client URL from environment variables
+const getClientOrigins = () => {
+  if (process.env.NODE_ENV === 'production') {
+    if (!process.env.CLIENT_URL) {
+      throw new Error('CLIENT_URL environment variable is required in production');
+    }
+    const clientUrl = process.env.CLIENT_URL;
+    return [clientUrl, `${clientUrl}/`];
+  }
+  return process.env.CLIENT_URL || 'http://localhost:3000';
+};
+
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://peerchats.netlify.app/",
+    origin: getClientOrigins(),
     methods: ["GET", "POST"]
   }
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: getClientOrigins(),
+  credentials: true
+}));
 app.use(express.json());
 
 // Store active users and their socket connections

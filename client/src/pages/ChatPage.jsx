@@ -53,7 +53,11 @@ const ChatPage = ({ onBack, userData }) => {
     }
   }, []);  // Initialize Socket.io connection
   useEffect(() => {
-    const newSocket = io('https://buddytalk-production.up.railway.app/', {
+    const serverUrl = process.env.NODE_ENV === 'production' 
+      ? process.env.REACT_APP_SERVER_URL || 'https://buddytalk-production.up.railway.app'
+      : 'http://localhost:5000';
+    
+    const newSocket = io(serverUrl, {
       transports: ['websocket', 'polling'],
       query: {
         userId: userData.id,
