@@ -54,7 +54,10 @@ const ChatPage = ({ onBack, userData }) => {
   }, []);  // Initialize Socket.io connection
   useEffect(() => {
     const serverUrl = process.env.NODE_ENV === 'production' 
-      ? process.env.REACT_APP_SERVER_URL || 'https://buddytalk-production.up.railway.app'
+      ? process.env.REACT_APP_SERVER_URL || (() => {
+          console.error('REACT_APP_SERVER_URL is required in production');
+          return 'https://buddytalk-production.up.railway.app';
+        })()
       : 'http://localhost:5000';
     
     const newSocket = io(serverUrl, {
@@ -465,7 +468,7 @@ const ChatPage = ({ onBack, userData }) => {
         otherUserId: selectedUser.userId
       });
     }
-  }, [selectedUser, userData.id, socket]);
+  }, [selectedUser, userData.id, socket, conversations]);
 
   // Auto-scroll effect - only triggers on scrollTrigger changes
   useEffect(() => {
@@ -493,7 +496,7 @@ const ChatPage = ({ onBack, userData }) => {
       messagesContainer.addEventListener('scroll', handleScroll);
       return () => messagesContainer.removeEventListener('scroll', handleScroll);
     }
-  }, [selectedUser, selectedGroup]);
+  }, [selectedUser, selectedGroup, shouldAutoScroll]);
 
   // Load group conversation from localStorage and server
   useEffect(() => {
@@ -515,7 +518,7 @@ const ChatPage = ({ onBack, userData }) => {
         groupId: selectedGroup.id
       });
     }
-  }, [selectedGroup, socket]);
+  }, [selectedGroup, socket, groupConversations]);
 
   // Save dark mode preference
   useEffect(() => {
