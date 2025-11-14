@@ -98,7 +98,7 @@ const LandingPage = ({ onStartChat, userData }) => {
 
         {/* Footer */}
       
-        </div>
+        
       </div>
     </div>
   );
