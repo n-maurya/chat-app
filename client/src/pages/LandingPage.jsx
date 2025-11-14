@@ -97,8 +97,7 @@ const LandingPage = ({ onStartChat, userData }) => {
         </button>
 
         {/* Footer */}
-        <div className="mt-16 text-gray-500 text-sm">
-          <p>Created by Adarsh</p>
+      
         </div>
       </div>
     </div>
